@@ -15,6 +15,11 @@ function formatNumber(num: number): string {
   return num.toString();
 }
 
+function shortenAddress(address: string): string {
+  const prefix = address.substr(0, 6);
+  const suffix = address.substr(-6);
+  return prefix.length < 1 || suffix.length < 1 ? "" : `${prefix}....${suffix}`;
+}
 
 const Home: NextPage = () => {
 
@@ -25,6 +30,7 @@ const Home: NextPage = () => {
     value: bigint;
   })
   const [loading, setLoading] = useState(false)
+
   const resolve = () => {
     const resolution = new Resolution()
     setLoading(true)
@@ -32,8 +38,9 @@ const Home: NextPage = () => {
       setLoading(false)
       setAddress(data.address)
       setBalance((data.balance))
-    }).catch(e=> console.log(e))
+    }).catch(e => console.log(e))
   }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -45,25 +52,22 @@ const Home: NextPage = () => {
         <link href="/favicon.ico" rel="icon" />
       </Head>
 
-      <main className={styles.main}>
+      {/* Navigation Bar */}
+      <nav className={styles.navbar}>
         <ConnectButton />
+      </nav>
 
-        <div style={{
-          marginTop: "10px"
-        }}>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-          <button onClick={resolve}>{loading? "Loading.....":"Resolve your name"}</button>
-          <h1>{name}</h1>
-          <p>Address: {loading ? "Loading...." : address}</p>
-          <p>Balance: {loading ? "Loading...." : formatNumber(Number(balance.formatted))}</p>
+      <main className={styles.main}>
+        {/* Card with Transparent Background */}
+        <div className={styles.card}>
+          <div className={styles.cardContent}>
+            <input className={styles.input} type="text" value={name} onChange={(e) => setName(e.target.value)} />
+            <button className={styles.button} onClick={resolve} disabled={loading}>{loading ? "Loading....." : "Resolve your name"}</button>
+            <p className={styles.p}>Address: {loading ? "Loading...." : shortenAddress(address)}</p>
+            <p className={styles.p}>Balance: {loading ? "Loading...." : formatNumber(Number(balance.formatted))}</p>
+          </div>
         </div>
       </main>
-
-      <footer className={styles.footer}>
-        <a href="https://rainbow.me" rel="noopener noreferrer" target="_blank">
-          Made with ❤️ by your frens at 🌈
-        </a>
-      </footer>
     </div>
   );
 };

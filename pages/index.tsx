@@ -2,8 +2,38 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
+import Resolution from "@lestprotocol/sdk"
+import { useEffect, useState } from 'react';
+
+
+function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  }
+  return num.toString();
+}
+
 
 const Home: NextPage = () => {
+
+  const [name, setName] = useState("")
+  const [address, setAddress] = useState("")
+  const [balance, setBalance] = useState({} as {
+    formatted: string;
+    value: bigint;
+  })
+  const [loading, setLoading] = useState(false)
+  const resolve = () => {
+    const resolution = new Resolution()
+    setLoading(true)
+    resolution.resolveDomain(name).then(data => {
+      setLoading(false)
+      setAddress(data.address)
+      setBalance((data.balance))
+    }).catch(e=> console.log(e))
+  }
   return (
     <div className={styles.container}>
       <Head>
@@ -18,57 +48,14 @@ const Home: NextPage = () => {
       <main className={styles.main}>
         <ConnectButton />
 
-        <h1 className={styles.title}>
-          Welcome to <a href="">RainbowKit</a> + <a href="">wagmi</a> +{' '}
-          <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a className={styles.card} href="https://rainbowkit.com">
-            <h2>RainbowKit Documentation &rarr;</h2>
-            <p>Learn how to customize your wallet connection flow.</p>
-          </a>
-
-          <a className={styles.card} href="https://wagmi.sh">
-            <h2>wagmi Documentation &rarr;</h2>
-            <p>Learn how to interact with Ethereum.</p>
-          </a>
-
-          <a
-            className={styles.card}
-            href="https://github.com/rainbow-me/rainbowkit/tree/main/examples"
-          >
-            <h2>RainbowKit Examples &rarr;</h2>
-            <p>Discover boilerplate example RainbowKit projects.</p>
-          </a>
-
-          <a className={styles.card} href="https://nextjs.org/docs">
-            <h2>Next.js Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a
-            className={styles.card}
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-          >
-            <h2>Next.js Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            className={styles.card}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+        <div style={{
+          marginTop: "10px"
+        }}>
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+          <button onClick={resolve}>{loading? "Loading.....":"Resolve your name"}</button>
+          <h1>{name}</h1>
+          <p>Address: {loading ? "Loading...." : address}</p>
+          <p>Balance: {loading ? "Loading...." : formatNumber(Number(balance.formatted))}</p>
         </div>
       </main>
 

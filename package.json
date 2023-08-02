@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@lestprotocol/sdk": "^0.0.5",
     "@rainbow-me/rainbowkit": "^1.0.7",
     "next": "^13.4.3",
     "react": "^18.2.0",
